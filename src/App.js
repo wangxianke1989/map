@@ -26,6 +26,7 @@ export class App extends Component {
   updateQuery(value){
     this.setState({query:value.trim()})
   }
+  //通过查询词获取维基百科词条信息
   fetchWiki(place){
     let baseUrl='https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&&list=search&srsearch='
     let request = baseUrl+ place.title
@@ -48,8 +49,8 @@ export class App extends Component {
       }))
     })
   }
+  //加载页面的维基百科词条
   componentDidMount(){
-
     this.state.locations.map((place)=>{
       if(place.wiki){
         return
@@ -58,7 +59,7 @@ export class App extends Component {
       }
     })
   }
-
+  //点击地图标记后获取该地点信息
   clickMarker=(props)=>{
     if(props.place.wiki){
       this.setState({
@@ -75,8 +76,9 @@ export class App extends Component {
       });
     }
   }
-
+  //点击菜单中地点列表在相应地点位置弹出维基百科信息
   clickMenu=(place)=>{
+    // 如果已经获取过了维基百科信息，则不需要再次获取
     if(place.wiki){
       this.setState({
         selectedPlace:place,
@@ -94,8 +96,10 @@ export class App extends Component {
   }
 
 
+
   render(){
     let filteredLocations
+    //通过用户的输入信息过滤显示的地点
     if(this.state.query){
       const match = new RegExp(escapeRegExp(this.state.query),'i')
       filteredLocations = this.state.locations.filter((location)=>match.test(location.title))
@@ -117,19 +121,20 @@ export class App extends Component {
 
         <div className= "sidebar">
           <h3>Find Place</h3>
-          <div>
+          <div className="search-box">
             <input
-              id="search-place"
+              className="input-place"
               type="text"
               placeholder="enter place search"
               value = {this.props.query}
               onChange = {(event)=>this.updateQuery(event.target.value)}
             />
+            <button className="filter-button">Filter</button>
           </div>
           <ul>
             {filteredLocations.map((place)=>(
-              <div onClick={()=>this.clickMenu(place)}>
-                <li key={place.title}><p>{place.title}</p></li>
+              <div className="list">
+                <li key={place.title} onClick={()=>this.clickMenu(place)}><p>{place.title}</p></li>
               </div>
             ))}
           </ul>
@@ -151,6 +156,7 @@ export class App extends Component {
               visible ={this.state.showingInfoWindow}>
                 <div>
                   <h3>{this.state.selectedPlace.title}</h3>
+                  <h4>source:wikipedia</h4>
                   <div dangerouslySetInnerHTML={{ __html: this.state.selectedPlace.wiki}}></div>
                 </div>
             </InfoWindow>
